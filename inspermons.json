@@ -1,0 +1,20 @@
+[
+	{
+		"nome" : "picaxu",
+		"poder" : 20,
+		"vida" : 200,
+		"defesa" : 12
+	},
+	{
+		"nome" : "xamando",
+		"poder" : 25,
+		"vida" : 100,
+		"defesa" : 10
+	},
+	{
+		"nome" : "pidijet",
+		"poder" : 15,
+		"vida" : 300,
+		"defesa" : 10
+	}
+]
