@@ -1,5 +1,6 @@
 import random
-from json import dumps, load
+import json
+from pathlib import Path
 insperdex=[]
 
 def load():                                 #Carrega o dicionário de Inspermons
@@ -9,11 +10,12 @@ def load():                                 #Carrega o dicionário de Inspermons
     return lista_p
 
 def encontra_r(lista_p):                    #Encontra o rival
-    rival=random.choice(lista_p)
+    rival=dict(random.choice(lista_p))
     return rival
 
 def CalculaBatalha (pokj,lista_p):          #Função principal da batalha
     rival=encontra_r(lista_p)
+    rivalb=dict(rival)
     fugir=[1]*6+[0]*4                      #Lista para adicionar falha na fuga
     sorte=[0,7]+[0,8]*2+[0,9]*3+[1]*4+[1,1]*3+[1,2]*2+[1,3]
     
@@ -39,19 +41,19 @@ Vida do rival {1}:{3}
         rival["vida"] = rival["vida"] - ( pokj["poder"] - rival["defesa"] )*random.choice(sorte) #Ataque do jogador com fator sorte
         if rival["vida"] <= 0:
             print("Seu Inspèrmon ganhou")
-            pokj["exp"]=pokj["exp"]+rival["vida"]*0.1
+            pokj["exp"]=pokj["exp"]+rivalb["vida"]*0.25
             print("""Experiência ganha:+{0}
-Experiência Total:{1}/{2}""".format(rival["vida"]*0.1,pokj["exp"],int(pokj["vida"]*1.1)))
+Experiência Total:{1}/{2}""".format(rivalb["vida"]*0.25,pokj["exp"],int(pokj["vida"]*2)))
             if pokj["exp"]>pokj["vida"]*1.1:   #Evolução do Inspermon do jogador
                 print("""O SEU POKEMON EVOLUIU!
 Atributos ganhos:
 Vida: +{0} -> {3}
 Poder: +{1} -> {4}
 Defesa: +{2} -> {5}
-""".format(pokj["vida"]*0.1,pokj["poder"]*0.1,pokj["defesa"]*0.1,pokj["vida"]*1.1,pokj["poder"]*1.1,pokj["defesa"]*1.1))
-                pokj["vida"]=pokj["vida"]*1.1
-                pokj["poder"]=pokj["poder"]*1.1
-                pokj["defesa"]=pokj["defesa"]*1.1
+""".format(int(pokj["vida"]*0.1),int(pokj["poder"]*0.1),int(pokj["defesa"]*0.1),int(pokj["vida"]*1.1),int(pokj["poder"]*1.1),int(pokj["defesa"]*1.1)))
+                pokj["vida"]=int(pokj["vida"]*1.1)
+                pokj["poder"]=int(pokj["poder"]*1.1)
+                pokj["defesa"]=int(pokj["defesa"]*1.1)
                 pokj["nivel"]+=1
             return (1,pokj)
             
@@ -72,13 +74,17 @@ if op==1:
     for i in range(len(lista_p)):
         print("({0}) {1}".format(i+1, lista_p[i]["nome"]))
     pokn=int(input())-1
-    pokj=lista_p[pokn]                          #-1 pois no menu foi adicionado +1 na escolha
+    pokj=dict(lista_p[pokn])                       #-1 pois no menu foi adicionado +1 na escolha
     pokj["nivel"]=1
     pokj["exp"]=0
-else:   
-    with open('pokj.txt', 'r') as arquivo:
-        pokj=json.load(arquivo)
-        
+    pokj["pokn"]=pokn
+else:
+    my_file = Path("/path/to/file")
+    if my_file.is_file():
+        with open('pokj.txt', 'r') as arquivo:
+            pokj=json.load(arquivo)
+    else:
+        print("Erro, save não encontrado!!")
     print("""Jogo Carregado...
     Nome:{0}
     Vida:{1}
@@ -86,12 +92,13 @@ else:
     Defesa:{3}
     Experiência:{5}
     Nível:{4}""".format(pokj["nome"],pokj["vida"],pokj["poder"],pokj["defesa"],pokj["nivel"],pokj["exp"]))
-          
+    
+pokn=pokj["pokn"]     
 loop=1    
 while loop:
     
     with open('pokj.txt', 'w') as arquivo:
-        json.dump({'nome':pokj["nome"], 'vida':pokj["vida"], 'poder':pokj["poder"], 'defesa':pokj["defesa"], 'nivel':pokj["nivel"], 'exp':pokj["exp"]}, arquivo, indent=4)
+        json.dump({'nome':pokj["nome"], 'vida':pokj["vida"], 'poder':pokj["poder"], 'defesa':pokj["defesa"], 'nivel':pokj["nivel"], 'exp':pokj["exp"], 'pokn':pokn}, arquivo, indent=4)
     
     
     acao=int(input("""MENU:
@@ -110,8 +117,7 @@ while loop:
     elif acao==2:
         y=CalculaBatalha(pokj,lista_p)
         loop=y[0]
-        pokj=y[1]
-        
+        pokj=y[1]        
 
     elif acao==5:
         print("Boa Noite !")                 
@@ -127,7 +133,9 @@ Experiência:{5}
 Nível:{4}""".format(pokj["nome"],pokj["vida"],pokj["poder"],pokj["defesa"],pokj["nivel"],pokj["exp"]))
             
     elif acao==4:
-        pokj["vida"]=int(lista_p[pokn]["vida"]*(1.1**pokj["nivel"]))
+        pokj["vida"]=lista_p[pokn]["vida"]
+        for i in range(pokj["nivel"]-1):
+            pokj["vida"]=pokj["vida"]+pokj["vida"]*0.1                        
         print("A vida do seu Inspèrmon foi recuperada")
         
     else:
