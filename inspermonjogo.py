@@ -60,6 +60,7 @@ Defesa: +{2} -> {5}
         pokj["vida"] = pokj["vida"] - ( rival["poder"] - pokj["defesa"] )*random.choice(sorte)  #Ataque do rival com fator sorte
         if pokj["vida"] <= 0:
             print("Seu Inspèrmon perdeu! Game over :( ")
+            os.remove("data.txt")
             return (0,pokj)
         
 ############################
@@ -82,8 +83,8 @@ while verifica:
         pokj["pokn"]=pokn
         verifica=0
     else:    
-        if os.path.exists('pokj.txt'):
-            with open('pokj.txt', 'r') as arquivo:
+        if os.path.exists('data.txt'):
+            with open('data.txt', 'r') as arquivo:
                 pokj=json.load(arquivo)
                 
             print("""Jogo Carregado...
@@ -103,7 +104,7 @@ pokn=pokj["pokn"]
 loop=1    
 while loop:
     
-    with open('pokj.txt', 'w') as arquivo:
+    with open('data.txt', 'w') as arquivo:
         json.dump({'nome':pokj["nome"], 'vida':pokj["vida"], 'poder':pokj["poder"], 'defesa':pokj["defesa"], 'nivel':pokj["nivel"], 'exp':pokj["exp"], 'pokn':pokn}, arquivo, indent=4)
     
     
@@ -147,4 +148,4 @@ Nível:{4}""".format(pokj["nome"],pokj["vida"],pokj["poder"],pokj["defesa"],pokj
     else:
         print("Opção inválida")
         
-os.remove("pokj.txt")
+
