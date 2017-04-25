@@ -1,6 +1,6 @@
 import random
 import json
-from pathlib import Path
+import os.path
 insperdex=[]
 
 def load():                                 #Carrega o dicionário de Inspermons
@@ -59,40 +59,46 @@ Defesa: +{2} -> {5}
             
         pokj["vida"] = pokj["vida"] - ( rival["poder"] - pokj["defesa"] )*random.choice(sorte)  #Ataque do rival com fator sorte
         if pokj["vida"] <= 0:
-            print("Seu Inspèrmon perdeu")
+            print("Seu Inspèrmon perdeu! Game over :( ")
             return (0,pokj)
         
 ############################
 #Inicio do código principal#
 lista_p=load()
-
+  
 op=int(input ("""(1)Novo Jogo
 (2)Carregar Jogo Salvo
 Ação:"""))
-if op==1:  
-    print("Escolha um Inspèrmon:")
-    for i in range(len(lista_p)):
-        print("({0}) {1}".format(i+1, lista_p[i]["nome"]))
-    pokn=int(input())-1
-    pokj=dict(lista_p[pokn])                       #-1 pois no menu foi adicionado +1 na escolha
-    pokj["nivel"]=1
-    pokj["exp"]=0
-    pokj["pokn"]=pokn
-else:
-    my_file = Path("/path/to/file")
-    if my_file.is_file():
-        with open('pokj.txt', 'r') as arquivo:
-            pokj=json.load(arquivo)
-    else:
-        print("Erro, save não encontrado!!")
-    print("""Jogo Carregado...
-    Nome:{0}
-    Vida:{1}
-    Poder:{2}
-    Defesa:{3}
-    Experiência:{5}
-    Nível:{4}""".format(pokj["nome"],pokj["vida"],pokj["poder"],pokj["defesa"],pokj["nivel"],pokj["exp"]))
-    
+verifica=1
+while verifica:
+    if op==1:  
+        print("Escolha um Inspèrmon:")
+        for i in range(len(lista_p)):
+            print("({0}) {1}".format(i+1, lista_p[i]["nome"]))
+        pokn=int(input())-1
+        pokj=dict(lista_p[pokn])                       #-1 pois no menu foi adicionado +1 na escolha
+        pokj["nivel"]=1
+        pokj["exp"]=0
+        pokj["pokn"]=pokn
+        verifica=0
+    else:    
+        if os.path.exists('pokj.txt'):
+            with open('pokj.txt', 'r') as arquivo:
+                pokj=json.load(arquivo)
+                
+            print("""Jogo Carregado...
+            Nome:{0}
+            Vida:{1}
+            Poder:{2}
+            Defesa:{3}
+            Experiência:{5}
+            Nível:{4}""".format(pokj["nome"],pokj["vida"],pokj["poder"],pokj["defesa"],pokj["nivel"],pokj["exp"]))
+            verifica=0
+        else:
+            print("Erro, save não encontrado")
+            op=1
+        
+        
 pokn=pokj["pokn"]     
 loop=1    
 while loop:
@@ -141,4 +147,4 @@ Nível:{4}""".format(pokj["nome"],pokj["vida"],pokj["poder"],pokj["defesa"],pokj
     else:
         print("Opção inválida")
         
-
+os.remove("pokj.txt")
